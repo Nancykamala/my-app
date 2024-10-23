@@ -1,78 +1,44 @@
-// router.js
-import { createRouter, RootRoute, Route } from "@tanstack/react-router";
 import React, { lazy, Suspense } from "react";
+import ReactDOM from "react-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Home from "./modules/Home"; // Ensure paths are correct
+const Home = lazy(() => import("./components/Home"));
+const Login = lazy(() => import("./components/Login"));
+const ProductDetails = lazy(() => import("./components/ProductDetail"));
+const SearchPage = lazy(() => import("./components/Search"));
+const MultiStepForm = lazy(() => import("./components/MultiStepForm"));
+const PaymentDetails = lazy(() => import("./components/PaymentDetails"));
+const Address = lazy(() => import("./components/Address"));
+const About = lazy(() => import("./components/About"));
+const Contact = lazy(() => import("./components/Contact"));
+const PersonalInfo = lazy(() => import("./components/PersonalInfo"));
+const Result = lazy(() => import("./components/Result"));
+const Submission = lazy(() => import("./components/Submission"));
+const NotFound = lazy(() => import("./components/NotFound"));
 
-import Login from "./modules/Login";
-// import NotFound from "../NotFound";
-import NotFound from "./modules/NotFound";
+const router = createBrowserRouter([
+  { path: "/", element: <Home /> },
+  { path: "/login", element: <Login /> },
+  { path: "/product/:id", element: <ProductDetails /> },
+  { path: "/search", element: <SearchPage /> },
+  { path: "/form", element: <MultiStepForm /> },
+  { path: "/payment", element: <PaymentDetails /> },
+  { path: "/address", element: <Address /> },
+  { path: "/about", element: <About /> },
+  { path: "/contact", element: <Contact /> },
+  { path: "/personal-info", element: <PersonalInfo /> },
+  { path: "/result", element: <Result /> },
+  { path: "/submission", element: <Submission /> },
+  { path: "*", element: <NotFound /> },
+]);
 
-// Lazy load ProductDetail component
-const ProductDetail = lazy(() => import("./modules/ProductDetail"));
-
-// Sample product data
-const products = [
-  { id: 1, name: "Lipstick", price: "$12", image: "/images/lipstick.png" },
-  { id: 2, name: "Foundation", price: "$25", image: "/images/foundation.png" },
-  { id: 3, name: "Mascara", price: "$15", image: "/images/mascara.png" },
-];
-
-// Product loader function
-const productLoader = async ({ params }) => {
-  const product = products.find((p) => p.id === parseInt(params.id));
-  if (!product) throw new Error("Product not found");
-  return product;
-};
-
-// Root route definition
-const rootRoute = new RootRoute({
-  component: () => (
-    <>
-      <h1>Welcome to the App</h1>
-      <Outlet /> {/* Ensures child routes render */}
-    </>
-  ),
-});
-
-// Define child routes
-const homeRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/home",
-  component: () => <Home products={products} />,
-});
-
-const loginRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/login",
-  component: Login,
-});
-
-const productRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/product/:id",
-  component: () => (
-    <Suspense fallback={<div>Loading Product...</div>}>
-      <ProductDetail />
+function App() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RouterProvider router={router} />
     </Suspense>
-  ),
-  loader: productLoader,
-});
+  );
+}
 
-const notFoundRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "*",
-  component: NotFound,
-});
-
-// Create router instance
-const router = createRouter({
-  routeTree: rootRoute.addChildren([
-    homeRoute,
-    loginRoute,
-    productRoute,
-    notFoundRoute,
-  ]),
-});
-
-export default { router };
+ReactDOM.render(<App />, document.getElementById("root"));
+export default App;
